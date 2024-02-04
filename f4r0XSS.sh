@@ -38,7 +38,7 @@ echo -e "\e[1;32m Find XSS Vulnerable  Parameter...  \e[0m"
         touch $url/recon/final_urls.txt
     fi
     if [ ! -f "$url/recon/final_urls1.txt" ];then
-        touch $url/recon/final_urls1.txt.txt
+        touch $url/recon/final_urls1.txt
     fi
     if [ ! -f "$url/recon/200_urls.txt" ];then
         touch $url/recon/200_urls.txt
@@ -53,13 +53,13 @@ echo -e "\e[1;32m Find XSS Vulnerable  Parameter...  \e[0m"
 # Harvesting subdomains (assetfinder & Sublist3r & subfinder & Crt.sh & amass)
 
     echo -e "$YELLOW[++] Harvesting subdomains with assetfinder... $RESET"
-    assetfinder --subs-only $url | grep '.$url'  >> $url/recon/final1.txt
+    assetfinder --subs-only $url  >> $url/recon/final1.txt
 
     echo -e "$YELLOW[++] Harvesting subdomains with Sublist3r...$RESET"
-    sublist3r  -d $url | grep '.$url'  >> $url/recon/final1.txt
+    sublist3r  -d $url   >> $url/recon/final1.txt
 
     echo -e "$YELLOW[++] Harvesting subdomains with subfinder...$RESET"
-    subfinder -d $url | grep '.$url'  >> $url/recon/final1.txt
+    subfinder -d $url   >> $url/recon/final1.txt
     
     echo -e "$YELLOW[++] Double checking for subdomains with Amass an& Crt.sh ...$RESET"
     #amass enum -d $url | tee -a $url/recon/final1.txt
@@ -70,21 +70,21 @@ echo -e "\e[1;32m Find XSS Vulnerable  Parameter...  \e[0m"
 
 
 #Harvesting all subdomians with assetfinder
-   echo -e "$YELLOW[++] Harvesting subdomains with assetfinder...$RESET"
-   cat $url/recon/final.txt | assetfinder --subs-only  | grep '.$url'  >> $url/recon/final_urls1.txt
-   sort -u $url/recon/final_urls1.txt >> $url/recon/final_urls.txt
-   rm $url/recon/final_urls1.txt
+#    echo -e "$YELLOW[++] Harvesting subdomains with assetfinder...$RESET"
+#    cat $url/recon/final.txt | assetfinder --subs-only   >> $url/recon/final_urls1.txt
+#    sort -u $url/recon/final_urls1.txt >> $url/recon/final_urls.txt
+#    rm $url/recon/final_urls1.txt
 
-#We need to use HTTPX to quickly identify URLs that return 200 Status code 
+#We need to use HTTPX to identify URLs that return 200 Status code quickly 
   echo -e "$YELLOW[++] Identify URLs that return 200 Status code...$RESET"
-  cat $url/recon/final_urls.txt | httpx -mc 200 > $url/recon/200_urls.txt
+  cat $url/recon/final.txt | httpx -mc 200 > $url/recon/200_urls.txt
 
 
 #Running ParamSpider for crawling all the paramaters 
-  echo -e "$YELLOW[++] ParamSpider for crawling all the paramaters ...$RESET"
-  paramspider -l $url/recon/200_urls.txt >> $url/recon/ParamSpider_urls.txt
-  
+  echo -e "$YELLOW[++] ParamSpider for crawling all the parameters ...$RESET"
+  #paramspider -l $url/recon/200_urls.txt >> $url/recon/ParamSpider_urls.txt
+  for URL in $url/recon/200_urls.txt; do (paramspider -d "${URL}");done
 
-# Running KXSS for indentfying the filtered , unfiltered Sympols 
-   echo -e "$YELLOW[++] Running KXSS for indentfying the filtered... $RESET"
+# Running KXSS for identifying the filtered , unfiltered Sympols 
+   echo -e "$YELLOW[++] Running KXSS for identifying the filtered... $RESET"
    cat $url/recon/ParamSpider_urls.txt | kxss
